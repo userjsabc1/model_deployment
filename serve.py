@@ -22,6 +22,7 @@ def build_args() -> list[str]:
         "--gpu-memory-utilization", str(CONFIG.gpu_memory_utilization),
         "--max-model-len", str(CONFIG.max_model_len),
         "--enable-prefix-caching",
+        "--trust-remote-code",
     ]
 
     if CONFIG.quantization == "bitsandbytes":
