@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """启动 vLLM OpenAI 兼容推理服务"""
+import asyncio
 import os
 import sys
 from pathlib import Path
@@ -55,7 +56,7 @@ def main() -> None:
 
     parser = make_arg_parser(FlexibleArgumentParser())
     parsed_args = parser.parse_args(args)
-    run_server(parsed_args)
+    asyncio.run(run_server(parsed_args))
 
 
 if __name__ == "__main__":
