@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm-qwen3.5-27b
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # 挂载本地模型目录，避免每次重启重新下载
+      - /data/models/qwen3.5-27b:/models/qwen3.5-27b
+      # 挂载 HuggingFace 缓存
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      - HF_ENDPOINT=https://hf-mirror.com
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: >
+      --model /models/qwen3.5-27b
+      --served-model-name qwen3.5-27b
+      --host 0.0.0.0
+      --port 8000
+      --dtype float16
+      --quantization bitsandbytes
+      --load-format bitsandbytes
+      --gpu-memory-utilization 0.92
+      --max-model-len 32768
+      --enable-prefix-caching
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
